@@ -85,12 +85,12 @@ Window {
     // Shows logo.png from this folder when it exists, otherwise the word FULL.
     Rectangle {
       anchors.centerIn: parent
-      width: 84; height: 52; radius: 8
-      color: "#26282c"; border.width: 2; border.color: "#3a3d43"
+      width: 68; height: 68; radius: 34
+      color: "#0e0f11"; border.width: 2; border.color: "#3a3d43"
 
       Image {
         id: logo
-        anchors { fill: parent; margins: 5 }
+        anchors { fill: parent; margins: 6 }
         source: "logo.png"
         fillMode: Image.PreserveAspectFit
         smooth: true

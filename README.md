@@ -1,4 +1,4 @@
-# Traktor Touch FX (v0.4)
+# Traktor Touch FX (v0.5)
 
 A second-screen touch window for Traktor Pro 4 with full control of all four FX units,
 including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI or extra hardware.
@@ -10,8 +10,8 @@ including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI 
 3. Start Traktor, then Preferences > Controller Manager > Add... > Traktor > Kontrol D2.
    No D2 hardware is needed. Add it once only.
 4. The "Traktor Touch FX" window opens and goes fullscreen on the second monitor by itself.
-   The button in the centre switches fullscreen off and on.
-   To show your logo on it, put a `logo.png` into `qml/Screens/TraktorTouch/` and run the installer again.
+   The DjLab logo button in the centre switches fullscreen off and on
+   (image: `qml/Screens/TraktorTouch/logo.png`).
 5. For FX 3 and FX 4: Preferences > Effects > 4 FX Units.
 
 Uninstall: `install/uninstall-windows.cmd`, or `install/install-mac.command uninstall` in Terminal.
