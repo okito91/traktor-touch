@@ -226,12 +226,14 @@ Rectangle {
       readonly property real cellH: (height - spacing) / 2
 
       Repeater {
+        id: stepRepeater
         model: 16
         Rectangle {
           id: stepCell
           AppProperty { id: stepState; path: panel.base + ".pattern_player.steps." + (index + 1) + ".state" }
           readonly property bool on: stepState.value == true
           readonly property bool playing: currentStep.value == index
+          function setOn(v) { if (stepCell.on != v) stepState.value = v }
 
           width: stepGrid.cellW
           height: stepGrid.cellH
@@ -248,13 +250,36 @@ Rectangle {
             color: stepCell.on ? "#101010" : "#70757d"
           }
 
-          MultiPointTouchArea {
-            anchors.fill: parent
-            maximumTouchPoints: 1
-            onPressed: function(touchPoints) { stepState.value = !stepCell.on }
-          }
         }
       }
+    }
+
+    // One finger paints steps: the first step touched decides on/off, every step the finger crosses follows.
+    TouchSurface {
+      id: stepPaint
+      anchors.fill: stepGrid
+      property bool paintValue: true
+      property int  lastIndex: -1
+
+      function indexAt(px, py) {
+        if (px < 0 || py < 0 || px >= width || py >= height) return -1;
+        var c = Math.min(7, Math.floor(px / (stepGrid.cellW + stepGrid.spacing)));
+        var r = Math.min(1, Math.floor(py / (stepGrid.cellH + stepGrid.spacing)));
+        return r * 8 + c;
+      }
+      function paint(px, py, first) {
+        var i = indexAt(px, py);
+        if (i < 0 || i == lastIndex) return;
+        var cell = stepRepeater.itemAt(i);
+        if (!cell) return;
+        if (first) paintValue = !cell.on;
+        cell.setOn(paintValue);
+        lastIndex = i;
+      }
+
+      onDown: function(px, py) { lastIndex = -1; paint(px, py, true) }
+      onDrag: function(px, py) { paint(px, py, false) }
+      onUp: lastIndex = -1
     }
 
     TButton {

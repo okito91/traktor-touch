@@ -48,13 +48,11 @@ Item {
     }
   }
 
-  MultiPointTouchArea {
+  TouchSurface {
     anchors.fill: parent
-    maximumTouchPoints: 1
     enabled: !fader.dimmed
-    onPressed:  function(touchPoints) { fader.touched = true; fader.setFromY(touchPoints[0].y); fader.touchStart() }
-    onUpdated:  function(touchPoints) { fader.setFromY(touchPoints[0].y) }
-    onReleased: function(touchPoints) { fader.touched = false; fader.touchEnd() }
-    onCanceled: function(touchPoints) { fader.touched = false; fader.touchEnd() }
+    onDown: function(px, py) { fader.touched = true; fader.setFromY(py); fader.touchStart() }
+    onDrag: function(px, py) { fader.setFromY(py) }
+    onUp: { fader.touched = false; fader.touchEnd() }
   }
 }

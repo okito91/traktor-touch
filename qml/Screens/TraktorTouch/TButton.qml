@@ -1,6 +1,6 @@
 import QtQuick 2.0
 
-// Touch button. Uses MultiPointTouchArea so several buttons/faders can be held at once.
+// Touch button.
 Rectangle {
   id: btn
 
@@ -33,12 +33,10 @@ Rectangle {
     elide: Text.ElideRight
   }
 
-  MultiPointTouchArea {
+  TouchSurface {
     anchors.fill: parent
-    maximumTouchPoints: 1
     enabled: !btn.dimmed
-    onPressed:  function(touchPoints) { btn.down = true;  btn.pressed() }
-    onReleased: function(touchPoints) { btn.down = false; btn.released() }
-    onCanceled: function(touchPoints) { btn.down = false; btn.released() }
+    onDown: function(px, py) { btn.down = true; btn.pressed() }
+    onUp: { btn.down = false; btn.released() }
   }
 }

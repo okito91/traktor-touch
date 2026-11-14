@@ -1,4 +1,4 @@
-# Traktor Touch FX (v0.1, untested build)
+# Traktor Touch FX (v0.2)
 
 A second-screen touch window for Traktor Pro 4 with full control of all four FX units,
 including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI or extra hardware.
@@ -8,9 +8,10 @@ including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI 
 2. Windows: double-click `install/install-windows.cmd` (asks for admin rights).
    macOS: double-click `install/install-mac.command` (asks for your password if needed).
 3. Start Traktor, then Preferences > Controller Manager > Add... > Traktor > Kontrol D2.
-   No D2 hardware is needed. Use the D2, not the S8: the S8 has two screens and would open two windows.
-4. The "Traktor Touch FX" window opens. With a second monitor it goes fullscreen there;
-   the round FS button in the centre toggles fullscreen.
+   No D2 hardware is needed. Add it once only.
+4. The "Traktor Touch FX" window opens. With a second monitor it goes fullscreen there.
+   Centre buttons: FULL toggles fullscreen; TOUCH / MOUSE switches the input method
+   (use MOUSE if faders do not follow your finger; it gives up two-faders-at-once).
 5. For FX 3 and FX 4: Preferences > Effects > 4 FX Units.
 
 Uninstall: `install/uninstall-windows.cmd`, or `install/install-mac.command uninstall` in Terminal.
@@ -29,9 +30,7 @@ A Traktor update removes the mod; run the installer again.
 - Single: tap the name to pick the effect; ON, three parameters and three buttons.
 - Pattern Player: tap the kit name to pick a kit; volume, sound and the other two parameters
   (stepped ones get + / - buttons), 16 step buttons, CLEAR.
+  Slide one finger across the steps to paint them: the first step you touch decides on or off.
 
-## To check on first run
-- Step buttons: Traktor shows step state to QML, but writing it from a screen is unconfirmed.
-- CLEAR and SNAP are trigger-type controls; confirm they fire.
-- Two faders at once on your touch monitor (Windows should; macOS depends on the monitor driver).
-- If the window does not appear, Traktor's log will name the QML line at fault.
+## Updating
+Quit Traktor and run the installer again; it replaces the TraktorTouch folder.

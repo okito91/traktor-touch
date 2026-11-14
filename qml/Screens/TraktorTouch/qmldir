@@ -1,0 +1,7 @@
+singleton TouchRegistry     TouchRegistry.qml
+TouchSurface                TouchSurface.qml
+TButton                     TButton.qml
+TFader                      TFader.qml
+FxColumn                    FxColumn.qml
+FxUnitPanel                 FxUnitPanel.qml
+FxPicker                    FxPicker.qml
