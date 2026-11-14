@@ -7,7 +7,7 @@ Rectangle {
 
   property int  unit: 1                 // 1..4
   property bool unitAvailable: true     // false when Traktor runs in 2-FX-unit mode and unit > 2
-  property bool touchMode: false        // fader touch switches the effect on, release switches it off
+  property bool touchMode: true         // fader touch switches the effect on, release switches it off
 
   signal pickerRequested(string title, var prop)
 
@@ -121,24 +121,26 @@ Rectangle {
 
   // touch mode: how many faders are currently held (Single mode shares one ON switch)
   property int heldFaders: 0
+  onIsGroupChanged: heldFaders = 0
   function faderDown(slot) {
-    if (!touchMode || isPattern) return;
+    if (!touchMode) return;
     if (isGroup) {
       if (slot == 1) fxButton1.value = true;
       if (slot == 2) fxButton2.value = true;
       if (slot == 3) fxButton3.value = true;
-    } else if (isSingle) {
+    } else {
+      // Single and Pattern Player: any fader switches the unit on
       heldFaders += 1;
       fxEnabled.value = true;
     }
   }
   function faderUp(slot) {
-    if (!touchMode || isPattern) return;
+    if (!touchMode) return;
     if (isGroup) {
       if (slot == 1) fxButton1.value = false;
       if (slot == 2) fxButton2.value = false;
       if (slot == 3) fxButton3.value = false;
-    } else if (isSingle) {
+    } else {
       heldFaders = Math.max(0, heldFaders - 1);
       if (heldFaders == 0) fxEnabled.value = false;
     }
@@ -165,7 +167,7 @@ Rectangle {
       TButton { width: 104; height: 60; label: "PATTERN"; fontSize: 16; lit: panel.isPattern; litColor: "#3fe0b0"; onPressed: fxType.value = FxType.PatternPlayer }
       TButton { width: 112; height: 60; label: panel.routingLabel(); fontSize: 15; onPressed: panel.nextRouting() }
       TButton { width: 70;  height: 60; label: "SNAP";  fontSize: 15; visible: !panel.isPattern; onPressed: fxStore.value = true }
-      TButton { width: 80;  height: 60; label: "TOUCH"; fontSize: 15; visible: !panel.isPattern; lit: panel.touchMode; litColor: "#4aa3ff"; onPressed: panel.touchMode = !panel.touchMode }
+      TButton { width: 80;  height: 60; label: "TOUCH"; fontSize: 15; lit: panel.touchMode; litColor: "#4aa3ff"; onPressed: panel.touchMode = !panel.touchMode }
     }
 
     Row {

@@ -81,12 +81,26 @@ Window {
       }
     }
 
-    // centre button: fullscreen on/off (plain MouseArea)
+    // centre button: fullscreen on/off (plain MouseArea).
+    // Shows logo.png from this folder when it exists, otherwise the word FULL.
     Rectangle {
       anchors.centerIn: parent
-      width: 64; height: 44; radius: 8
+      width: 84; height: 52; radius: 8
       color: "#26282c"; border.width: 2; border.color: "#3a3d43"
-      Text { anchors.centerIn: parent; text: "FULL"; color: "#e6e6e6"; font.pixelSize: 15; font.bold: true }
+
+      Image {
+        id: logo
+        anchors { fill: parent; margins: 5 }
+        source: "logo.png"
+        fillMode: Image.PreserveAspectFit
+        smooth: true
+        visible: status == Image.Ready
+      }
+      Text {
+        anchors.centerIn: parent
+        visible: logo.status != Image.Ready
+        text: "FULL"; color: "#e6e6e6"; font.pixelSize: 15; font.bold: true
+      }
       MouseArea { anchors.fill: parent; onClicked: win.toggleFullScreen() }
     }
 

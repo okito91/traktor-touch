@@ -1,4 +1,4 @@
-# Traktor Touch FX (v0.3)
+# Traktor Touch FX (v0.4)
 
 A second-screen touch window for Traktor Pro 4 with full control of all four FX units,
 including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI or extra hardware.
@@ -10,7 +10,8 @@ including Pattern Player mode. Traktor draws the window itself; no bridge, MIDI 
 3. Start Traktor, then Preferences > Controller Manager > Add... > Traktor > Kontrol D2.
    No D2 hardware is needed. Add it once only.
 4. The "Traktor Touch FX" window opens and goes fullscreen on the second monitor by itself.
-   The FULL button in the centre switches fullscreen off and on.
+   The button in the centre switches fullscreen off and on.
+   To show your logo on it, put a `logo.png` into `qml/Screens/TraktorTouch/` and run the installer again.
 5. For FX 3 and FX 4: Preferences > Effects > 4 FX Units.
 
 Uninstall: `install/uninstall-windows.cmd`, or `install/install-mac.command uninstall` in Terminal.
@@ -26,7 +27,8 @@ A Traktor update removes the mod; run the installer again.
 ## Each FX panel
 - GROUP / SINGLE / PATTERN: unit mode. SEND / INSERT / POST FADER: tap to cycle routing.
 - SNAP: store snapshot. A B C D: assign the unit to a deck.
-- TOUCH: touching a fader switches that effect on, releasing switches it off.
+- TOUCH (on by default): touching a fader switches the effect on, releasing switches it off.
+  Group: each slot fader controls its own slot. Single and Pattern Player: any fader controls the unit's ON.
 - Group: dry/wet + three slots (tap the name to pick an effect, fader, on button).
 - Single: tap the name to pick the effect; ON, three parameters and three buttons.
 - Pattern Player: tap the kit name to pick a kit; volume, sound and the other two parameters
