@@ -16,6 +16,8 @@ Item {
 
   signal topPressed()
   signal buttonPressed()
+  signal faderMoved(real v)
+  signal faderNudged(real v)
   signal faderTouchStart()
   signal faderTouchEnd()
 
@@ -26,7 +28,9 @@ Item {
     if (!faderProp || steps < 2) return;
     var idx = Math.round(faderProp.value * (steps - 1)) + dir;
     idx = Math.max(0, Math.min(steps - 1, idx));
-    faderProp.value = idx / (steps - 1);
+    var v = idx / (steps - 1);
+    faderProp.value = v;
+    faderNudged(v);
   }
 
   TButton {
@@ -48,6 +52,7 @@ Item {
     prop: col.faderProp
     fillColor: col.accent
     dimmed: !col.active
+    onMoved: function(v) { col.faderMoved(v) }
     onTouchStart: col.faderTouchStart()
     onTouchEnd: col.faderTouchEnd()
   }

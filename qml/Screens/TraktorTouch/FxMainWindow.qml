@@ -22,19 +22,39 @@ Window {
     win.visibility = (win.visibility == Window.FullScreen) ? Window.Windowed : Window.FullScreen;
   }
 
-  // Start fullscreen on the second monitor when there is one; otherwise stay a normal window.
-  Component.onCompleted: {
-    try {
-      var screens = Qt.application.screens;
-      if (screens && screens.length > 1) {
-        win.screen = screens[screens.length - 1];
-        win.x = win.screen.virtualX;
-        win.y = win.screen.virtualY;
-        win.visibility = Window.FullScreen;
-      }
-    } catch (e) {
-      console.log("TraktorTouch: could not move to second screen: " + e);
+  // Go fullscreen on the second monitor (the one that is not the primary at 0,0).
+  // With a single monitor the window stays a normal window.
+  function findSecondScreen() {
+    var screens = Qt.application.screens;
+    if (!screens || screens.length < 2) return null;
+    for (var i = 0; i < screens.length; i++) {
+      if (screens[i].virtualX != 0 || screens[i].virtualY != 0) return screens[i];
     }
+    return screens[screens.length - 1];
+  }
+
+  function goToSecondScreen() {
+    var s = findSecondScreen();
+    if (!s) return;
+    try { win.visibility = Window.Windowed; } catch (e) {}
+    try { win.screen = s; } catch (e) { console.log("TraktorTouch: screen assign failed: " + e); }
+    try {
+      win.x = s.virtualX;
+      win.y = s.virtualY;
+      win.width = s.width;
+      win.height = s.height;
+    } catch (e) { console.log("TraktorTouch: move failed: " + e); }
+    try { win.showFullScreen(); } catch (e) { win.visibility = Window.FullScreen; }
+  }
+
+  // wait until Traktor has finished opening its own window, then place ours
+  Timer { id: placeTimer; interval: 1200; onTriggered: win.goToSecondScreen() }
+  Component.onCompleted: placeTimer.start()
+
+  // a monitor was plugged in or removed
+  Connections {
+    target: Qt.application
+    function onScreensChanged() { placeTimer.restart() }
   }
 
   Item {
@@ -61,24 +81,13 @@ Window {
       }
     }
 
-    // centre controls: fullscreen toggle and input mode. Plain MouseAreas so they work in either input mode.
-    Column {
+    // centre button: fullscreen on/off (plain MouseArea)
+    Rectangle {
       anchors.centerIn: parent
-      spacing: 6
-
-      Rectangle {
-        width: 64; height: 40; radius: 8
-        color: "#26282c"; border.width: 2; border.color: "#3a3d43"
-        Text { anchors.centerIn: parent; text: "FULL"; color: "#e6e6e6"; font.pixelSize: 15; font.bold: true }
-        MouseArea { anchors.fill: parent; onClicked: win.toggleFullScreen() }
-      }
-
-      Rectangle {
-        width: 64; height: 40; radius: 8
-        color: TouchRegistry.mouseInput ? "#4aa3ff" : "#26282c"; border.width: 2; border.color: "#3a3d43"
-        Text { anchors.centerIn: parent; text: TouchRegistry.mouseInput ? "MOUSE" : "TOUCH"; color: TouchRegistry.mouseInput ? "#101010" : "#e6e6e6"; font.pixelSize: 13; font.bold: true }
-        MouseArea { anchors.fill: parent; onClicked: TouchRegistry.mouseInput = !TouchRegistry.mouseInput }
-      }
+      width: 64; height: 44; radius: 8
+      color: "#26282c"; border.width: 2; border.color: "#3a3d43"
+      Text { anchors.centerIn: parent; text: "FULL"; color: "#e6e6e6"; font.pixelSize: 15; font.bold: true }
+      MouseArea { anchors.fill: parent; onClicked: win.toggleFullScreen() }
     }
 
     FxPicker {

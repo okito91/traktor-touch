@@ -11,12 +11,17 @@ $screen = Join-Path $qml 'Screens\S8\Views\Screen.qml'
 $backup = "$screen.traktortouch-backup"
 $dest   = Join-Path $qml 'Screens\TraktorTouch'
 $src    = Join-Path $PSScriptRoot '..\qml\Screens\TraktorTouch'
+$d2       = Join-Path $qml 'CSI\D2\D2.qml'
+$d2Backup = "$d2.traktortouch-backup"
+$bridge   = Join-Path $qml 'CSI\D2\TraktorTouchBridge.qml'
 $marker = '// TRAKTOR-TOUCH'
 $hook   = "`r`n  $marker (second-screen FX window)`r`n  Loader { source: `"../../TraktorTouch/FxWindow.qml`" }`r`n"
 
 if ($Uninstall) {
   if (Test-Path $backup) { Copy-Item $backup $screen -Force; Remove-Item $backup }
   if (Test-Path $dest)   { Remove-Item $dest -Recurse -Force }
+  if (Test-Path $d2Backup) { Copy-Item $d2Backup $d2 -Force; Remove-Item $d2Backup }
+  if (Test-Path $bridge)   { Remove-Item $bridge -Force }
   Write-Host 'Traktor Touch FX removed.' -ForegroundColor Green; exit 0
 }
 
@@ -31,6 +36,17 @@ if ($text.Contains($marker)) {
   $i = $text.LastIndexOf('}')
   if ($i -lt 0) { Write-Host 'Unexpected Screen.qml - not patched.' -ForegroundColor Red; exit 1 }
   [IO.File]::WriteAllText($screen, $text.Substring(0, $i) + $hook + $text.Substring($i))
+}
+# knob bridge for the D2 mapping
+Copy-Item (Join-Path $PSScriptRoot '..\qml\CSI\D2\TraktorTouchBridge.qml') $bridge -Force
+$d2Text = [IO.File]::ReadAllText($d2)
+if (-not $d2Text.Contains($marker)) {
+  if (-not (Test-Path $d2Backup)) { Copy-Item $d2 $d2Backup }
+  $m = [regex]::Match($d2Text, 'Mapping\s*\{')
+  if (-not $m.Success) { Write-Host 'Unexpected D2.qml - not patched.' -ForegroundColor Red; exit 1 }
+  $at = $m.Index + $m.Length
+  $d2Hook = "`r`n  TraktorTouchBridge { name: `"traktor_touch_bridge`" } $marker"
+  [IO.File]::WriteAllText($d2, $d2Text.Substring(0, $at) + $d2Hook + $d2Text.Substring($at))
 }
 Write-Host "Installed into $qml" -ForegroundColor Green
 Write-Host 'Now start Traktor and add: Preferences > Controller Manager > Add... > Traktor > Kontrol D2'

@@ -37,6 +37,18 @@ Rectangle {
   AppProperty { id: fxParam2;  path: panel.base + ".parameters.2" }
   AppProperty { id: fxParam3;  path: panel.base + ".parameters.3" }
 
+  // Knob inputs. parameters.N only shows the value; moving it goes through knobs.N and the CSI bridge.
+  AppProperty { id: fxKnob1; path: panel.base + ".knobs.1" }
+  AppProperty { id: fxKnob2; path: panel.base + ".knobs.2" }
+  AppProperty { id: fxKnob3; path: panel.base + ".knobs.3" }
+  readonly property string bridge: "mapping.state.traktor_touch.fx" + unit
+  MappingProperty { id: bridgeValue1;  path: panel.bridge + ".knob1.value" }
+  MappingProperty { id: bridgeValue2;  path: panel.bridge + ".knob2.value" }
+  MappingProperty { id: bridgeValue3;  path: panel.bridge + ".knob3.value" }
+  MappingProperty { id: bridgeActive1; path: panel.bridge + ".knob1.active" }
+  MappingProperty { id: bridgeActive2; path: panel.bridge + ".knob2.active" }
+  MappingProperty { id: bridgeActive3; path: panel.bridge + ".knob3.active" }
+
   AppProperty { id: fxKnob1Name; path: panel.base + ".knobs.1.name" }
   AppProperty { id: fxKnob2Name; path: panel.base + ".knobs.2.name" }
   AppProperty { id: fxKnob3Name; path: panel.base + ".knobs.3.name" }
@@ -76,6 +88,35 @@ Rectangle {
     if (fxRouting.value == FxRouting.Send) fxRouting.value = FxRouting.Insert;
     else if (fxRouting.value == FxRouting.Insert) fxRouting.value = FxRouting.PostFader;
     else fxRouting.value = FxRouting.Send;
+  }
+
+  // --- knob writing ---
+  function knobSet(slot, v) {
+    var k = [null, fxKnob1, fxKnob2, fxKnob3][slot];
+    var b = [null, bridgeValue1, bridgeValue2, bridgeValue3][slot];
+    try { if (b) b.value = v; } catch (e) {}
+    try { if (k) k.value = v; } catch (e) {}
+  }
+  function knobHold(slot, on) {
+    var a = [null, bridgeActive1, bridgeActive2, bridgeActive3][slot];
+    try { if (a) a.value = on; } catch (e) {}
+  }
+  // + / - buttons: send one value, then let go again
+  property var pulsing: [false, false, false, false]
+  function knobPulse(slot, v) {
+    knobSet(slot, v);
+    knobHold(slot, true);
+    pulsing[slot] = true;
+    pulseTimer.restart();
+  }
+  Timer {
+    id: pulseTimer
+    interval: 80
+    onTriggered: {
+      for (var i = 1; i <= 3; i++) {
+        if (panel.pulsing[i]) { panel.pulsing[i] = false; panel.knobHold(i, false); }
+      }
+    }
   }
 
   // touch mode: how many faders are currently held (Single mode shares one ON switch)
@@ -173,8 +214,10 @@ Rectangle {
       buttonLit: fxButton1.value == true
       onTopPressed: panel.pickerRequested("FX " + panel.unit + "  •  Slot 1", fxSelect1)
       onButtonPressed: fxButton1.value = !fxButton1.value
-      onFaderTouchStart: panel.faderDown(1)
-      onFaderTouchEnd: panel.faderUp(1)
+      onFaderMoved: function(v) { panel.knobSet(1, v) }
+      onFaderNudged: function(v) { panel.knobPulse(1, v) }
+      onFaderTouchStart: { panel.knobHold(1, true); panel.faderDown(1) }
+      onFaderTouchEnd: { panel.knobHold(1, false); panel.faderUp(1) }
     }
 
     FxColumn {
@@ -188,8 +231,10 @@ Rectangle {
       buttonLit: fxButton2.value == true
       onTopPressed: panel.pickerRequested("FX " + panel.unit + "  •  Slot 2", fxSelect2)
       onButtonPressed: fxButton2.value = !fxButton2.value
-      onFaderTouchStart: panel.faderDown(2)
-      onFaderTouchEnd: panel.faderUp(2)
+      onFaderMoved: function(v) { panel.knobSet(2, v) }
+      onFaderNudged: function(v) { panel.knobPulse(2, v) }
+      onFaderTouchStart: { panel.knobHold(2, true); panel.faderDown(2) }
+      onFaderTouchEnd: { panel.knobHold(2, false); panel.faderUp(2) }
     }
 
     FxColumn {
@@ -203,8 +248,10 @@ Rectangle {
       buttonLit: fxButton3.value == true
       onTopPressed: panel.pickerRequested("FX " + panel.unit + "  •  Slot 3", fxSelect3)
       onButtonPressed: fxButton3.value = !fxButton3.value
-      onFaderTouchStart: panel.faderDown(3)
-      onFaderTouchEnd: panel.faderUp(3)
+      onFaderMoved: function(v) { panel.knobSet(3, v) }
+      onFaderNudged: function(v) { panel.knobPulse(3, v) }
+      onFaderTouchStart: { panel.knobHold(3, true); panel.faderDown(3) }
+      onFaderTouchEnd: { panel.knobHold(3, false); panel.faderUp(3) }
     }
   }
 

@@ -10,6 +10,7 @@ Item {
   property bool   touched: false
   readonly property real value: (prop && prop.value !== undefined) ? Math.max(0, Math.min(1, prop.value)) : 0
 
+  signal moved(real v)
   signal touchStart()
   signal touchEnd()
 
@@ -18,8 +19,9 @@ Item {
   function setFromY(y) {
     if (!prop) return;
     var pad = 14;
-    var v = 1 - (y - pad) / (height - 2 * pad);
-    prop.value = Math.max(0, Math.min(1, v));
+    var v = Math.max(0, Math.min(1, 1 - (y - pad) / (height - 2 * pad)));
+    prop.value = v;
+    moved(v);
   }
 
   Rectangle {
